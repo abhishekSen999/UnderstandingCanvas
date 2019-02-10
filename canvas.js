@@ -68,30 +68,42 @@ function(event){
     
 })
 
+
+
+/*
+this class draws and handels all functionalities concerned with each circle.
+this includes conditional updation. 
+*/
 class Circle {
-    constructor(x, dx, y, dy, radius, r, g, b) {
+    constructor(x, dx, y, dy, radius, color) {
         this.x = x;
         this.y = y;
-        this.dx = dx;
-        this.dy = dy;
+        this.dx = dx;//direction and speed of movement along x axis
+        this.dy = dy;//direction and speed of movement along y axis
         this.radius = radius;
-        this.red = r;
-        this.green = g;
-        this.blue = b;
-        this.minRadius = 0.2 * radius;
-        this.maxRadius = 3 * radius;
+        // this.red = r;
+        // this.green = g;
+        // this.blue = b;
+        this.color=color;
+        
+        this.minRadius = 0.2 * radius;//minimum radius is 20% of initial radius
+        this.maxRadius = 3 * radius;//maximum radius is 300 % of initial radius
     }
-    draw ()
+    draw ()//draws the circle
     {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0 * Math.PI / 180, 360 * Math.PI / 180, true);
-        ctx.strokeStyle = "rgba(" + this.red + "," + this.green + "," + this.blue + ",1)";
+        ctx.strokeStyle = this.createRgbaString(this.color);
         ctx.stroke();
-        ctx.fillStyle="rgba(" + this.red + "," + this.green + "," + this.blue + ",0.5)";
+        ctx.fillStyle=this.createRgbaString(this.color);
         ctx.fill();
     }
-    update () 
+
+
+    update () //does conditional updations
     {
+        //circle movement
+        //makes sure circle bounces off the edge
         if (this.x + this.radius >= innerWidth || this.x - this.radius <= 0) {
             this.dx = -1 * this.dx;
         }
@@ -100,8 +112,10 @@ class Circle {
         }
         this.x += this.dx;
         this.y += this.dy;
-        //interactivity
-        var isTooClose = this.distance(mouse.x, mouse.y, this.x, this.y);
+
+
+        //interactivity with mouse pointer
+        var isTooClose = this.isCircleTooClose(mouse.x, mouse.y, this.x, this.y);
         if (isTooClose && this.radius <= this.maxRadius) {
             // this.radius=this.increasedRadius;
             this.radius += 1;
@@ -112,12 +126,21 @@ class Circle {
         }
         this.draw();
     }
-    distance(x1,y1,x2,y2){
+
+    //returns whether the two points are too close(within 50 px) of eachother
+    isCircleTooClose(x1,y1,x2,y2){
         if(Math.abs(x1-x2)<50 && Math.abs(y1-y2)<50)
             return true;
         return false;    
     
     }
+
+    // convert {r,g,b,b} to rgba string
+    createRgbaString(color) {
+        return `rgba(${color.red},${color.green},${color.blue},${color.brightness})`;
+    }
+
+    
 }
 
 
@@ -134,12 +157,15 @@ for (var i=0;i<numberOfCircles;i++)
     var dx=1*((Math.random()-0.5)<0?-1:1);
     var y=Math.random()*(innerHeight-2*radius)+radius;
     var dy=1*((Math.random()-0.5)>0?-1:1);
-    var red=Math.random()*255;
-    var green=Math.random()*255;
-    var blue=Math.random()*255;
+    var color={};
+    
+    color.red=Math.random()*255;
+    color.green=Math.random()*255;
+    color.blue=Math.random()*255;
+    color.brightness=Math.random()*0.8;
         
 
-    circleArray.push(new Circle(x,dx,y,dy,radius,red,green,blue));
+    circleArray.push(new Circle(x,dx,y,dy,radius,color));
 
 }
 
@@ -173,5 +199,8 @@ function animate(){
 
 
 
+
 animate();
+
+
 
