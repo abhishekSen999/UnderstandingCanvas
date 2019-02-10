@@ -68,62 +68,60 @@ function(event){
     
 })
 
-function Circle(x,dx,y,dy,radius,r,g,b){
-    this.x=x;    
-    this.y=y;
-    this.dx=dx;
-    this.dy=dy;
-    this.radius=radius;
-    this.red=r;
-    this.green=g;
-    this.blue=b;
-    this.minRadius=0.2*radius;
-    this.maxRadius=3*radius;
-
-    this.draw=function(){
-        ctx.beginPath();
-        ctx.arc(this.x,this.y,this.radius,0*Math.PI/180,360*Math.PI/180,true);
-        ctx.strokeStyle= "rgba("+this.red+","+this.green+","+this.blue+",1)";
-        ctx.stroke();
-    
+class Circle {
+    constructor(x, dx, y, dy, radius, r, g, b) {
+        this.x = x;
+        this.y = y;
+        this.dx = dx;
+        this.dy = dy;
+        this.radius = radius;
+        this.red = r;
+        this.green = g;
+        this.blue = b;
+        this.minRadius = 0.2 * radius;
+        this.maxRadius = 3 * radius;
     }
-    this.update=function(){
-        
-        if (this.x+this.radius>=innerWidth|| this.x-this.radius<=0){
-            this.dx=-1*this.dx;
-            
+    draw ()
+    {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0 * Math.PI / 180, 360 * Math.PI / 180, true);
+        ctx.strokeStyle = "rgba(" + this.red + "," + this.green + "," + this.blue + ",1)";
+        ctx.stroke();
+        ctx.fillStyle="rgba(" + this.red + "," + this.green + "," + this.blue + ",0.5)";
+        ctx.fill();
+    }
+    update () 
+    {
+        if (this.x + this.radius >= innerWidth || this.x - this.radius <= 0) {
+            this.dx = -1 * this.dx;
         }
-        if (this.y+this.radius>=innerHeight|| this.y-this.radius<=0){
-            this.dy=-1*this.dy;
-            
+        if (this.y + this.radius >= innerHeight || this.y - this.radius <= 0) {
+            this.dy = -1 * this.dy;
         }
-        this.x+=this.dx;
-        this.y+=this.dy;
-
+        this.x += this.dx;
+        this.y += this.dy;
         //interactivity
-        isTooClose=distance(mouse.x,mouse.y,this.x,this.y);
-        
-        if (isTooClose && this.radius<=this.maxRadius){
+        var isTooClose = this.distance(mouse.x, mouse.y, this.x, this.y);
+        if (isTooClose && this.radius <= this.maxRadius) {
             // this.radius=this.increasedRadius;
-            this.radius+=1;
+            this.radius += 1;
             console.log(isTooClose);
         }
-        else if(this.radius>this.minRadius)
-        {
-             this.radius-=1;
+        else if (this.radius > this.minRadius) {
+            this.radius -= 1;
         }
-
         this.draw();
     }
-
-} 
-
-function distance(x1,y1,x2,y2){
-    if(Math.abs(x1-x2)<50 && Math.abs(y1-y2)<50)
-        return true;
-    return false;    
-
+    distance(x1,y1,x2,y2){
+        if(Math.abs(x1-x2)<50 && Math.abs(y1-y2)<50)
+            return true;
+        return false;    
+    
+    }
 }
+
+
+
 
 
 
