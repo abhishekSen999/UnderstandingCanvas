@@ -128,7 +128,8 @@ function distance(x1,y1,x2,y2){
 
 
 var circleArray=[];
-for (var i=0;i<10000;i++)
+var numberOfCircles=Math.ceil(0.001*innerHeight*innerWidth);
+for (var i=0;i<numberOfCircles;i++)
 {
     var radius=10;
     var x=Math.random()*(innerWidth-2*radius) +radius;  
