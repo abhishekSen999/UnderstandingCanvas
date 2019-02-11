@@ -42,7 +42,7 @@ class Circle {
         this.minRadius = 0.2 * radius;//minimum radius is 20% of initial radius
         this.maxRadius = 3 * radius;//maximum radius is 300 % of initial radius
         this.minBrightness=0.2;
-        this.maxBrightness=0.5;
+        this.maxBrightness=1;
 
         this.adjoiningCircles=[undefined,undefined,undefined];
 
@@ -84,20 +84,20 @@ class Circle {
 
         //interactivity with mouse pointer
         var isTooClose = this.isCircleTooClose(mouse.x, mouse.y, this.x, this.y);
-        if (isTooClose && this.color.brightness < this.maxBrightness) {
+        if (isTooClose && this.color.brightness <= this.maxBrightness) {
             // this.radius=this.increasedRadius;
-            this.color.brightness += 1;
-            console.log(isTooClose);
+            this.color.brightness += 0.1;
+            console.log(isTooClose+"  dotx: "+this.x+"  doty: "+this.y+"    mousex: "+mouse.x+"   mousey: "+mouse.y);
         }
         else if (this.color.brightness > this.minBrightness) {
-            this.color.brightness -= 1;
+            this.color.brightness -= 0.1;
         }
         this.draw();
     }
 
     //returns whether the two points are too close(within 50 px) of eachother
     isCircleTooClose(x1,y1,x2,y2){
-        if(Math.abs(x1-x2)<50 && Math.abs(y1-y2)<50)
+        if(Math.abs(x1-x2)<20 && Math.abs(y1-y2)<20)
             return true;
         return false;    
     
