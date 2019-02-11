@@ -41,7 +41,8 @@ class Circle {
         
         this.minRadius = 0.2 * radius;//minimum radius is 20% of initial radius
         this.maxRadius = 3 * radius;//maximum radius is 300 % of initial radius
-        
+        this.minBrightness=0.2;
+        this.maxBrightness=0.5;
 
         this.adjoiningCircles=[undefined,undefined,undefined];
 
@@ -83,13 +84,13 @@ class Circle {
 
         //interactivity with mouse pointer
         var isTooClose = this.isCircleTooClose(mouse.x, mouse.y, this.x, this.y);
-        if (isTooClose && this.radius <= this.maxRadius) {
+        if (isTooClose && this.color.brightness < this.maxBrightness) {
             // this.radius=this.increasedRadius;
-            this.radius += 1;
+            this.color.brightness += 1;
             console.log(isTooClose);
         }
-        else if (this.radius > this.minRadius) {
-            this.radius -= 1;
+        else if (this.color.brightness > this.minBrightness) {
+            this.color.brightness -= 1;
         }
         this.draw();
     }
@@ -120,7 +121,7 @@ class Background{
         this.canvas.height= window.innerHeight;
         this.widthOfHexagon=widthOfHexagon;//(d in explanation)
         this.sideOfHexagon=Math.floor(this.widthOfHexagon/Math.sqrt(3));//(s in explanation)
-        this.radius=10;
+        this.radius=3;//px
         this.circleArray=[];
         this.colorScheme={red:255,green:255,blue:255,brightness:0.2};
         
