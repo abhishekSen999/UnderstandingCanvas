@@ -235,8 +235,8 @@ class Background{
         for(var row=0;row<yDimAxis;row++){
             for(var col=0;col<xDimAxis;col++){
                 if(mapWindow[row][col]!=undefined){
-                    mapWindow[row][col].x=this.widthOfHexagon*row;
-                    mapWindow[row][col].x=this.sideOfHexagon*col;
+                    mapWindow[row][col].x=this.widthOfHexagon*col;
+                    mapWindow[row][col].y=this.sideOfHexagon*row;
                 }
             }
         }
