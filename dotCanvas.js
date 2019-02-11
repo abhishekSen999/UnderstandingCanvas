@@ -122,7 +122,7 @@ class Background{
         this.sideOfHexagon=Math.floor(this.widthOfHexagon/Math.sqrt(3));//(s in explanation)
         this.radius=10;
         this.circleArray=[];
-        this.colorScheme={red:255,green:255,blue:255,brightness:0.5};
+        this.colorScheme={red:255,green:255,blue:255,brightness:0.2};
         
     }
     init(){
