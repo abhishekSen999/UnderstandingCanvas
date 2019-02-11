@@ -124,7 +124,7 @@ class Background{
         this.radius=3;//px
         this.circleArray=[];
         this.colorScheme={red:255,green:255,blue:255,brightness:0.2};
-        this.closenessFactor=1.4;
+        this.closenessFactor=1.5;
         
     }
     init(){
@@ -237,7 +237,7 @@ class Background{
         for(var row=0;row<yDimAxis;row++){
             for(var col=0;col<xDimAxis;col++){
                 if(mapWindow[row][col]!=undefined){
-                    mapWindow[row][col].x=this.widthOfHexagon*col;
+                    mapWindow[row][col].x=this.widthOfHexagon*col/this.closenessFactor;
                     mapWindow[row][col].y=this.sideOfHexagon*row;
                 }
             }
