@@ -97,9 +97,14 @@ class Circle {
 
     //returns whether the two points are too close(within 50 px) of eachother
     isCircleTooClose(x1,y1,x2,y2){
-        if(Math.abs(x1-x2)<20 && Math.abs(y1-y2)<20)
+        // if(Math.abs(x1-x2)<50 && Math.abs(y1-y2)<50)
+        //     return true;
+        // return false;    
+
+        var distance = Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+        if(distance<60)
             return true;
-        return false;    
+        return false;
     
     }
 
