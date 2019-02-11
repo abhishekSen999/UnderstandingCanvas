@@ -89,7 +89,7 @@ class Circle {
             this.color.brightness += 0.1;
             console.log(isTooClose+"  dotx: "+this.x+"  doty: "+this.y+"    mousex: "+mouse.x+"   mousey: "+mouse.y);
         }
-        else if (this.color.brightness > this.minBrightness) {
+        else if (!isTooClose && this.color.brightness > this.minBrightness) {
             this.color.brightness -= 0.1;
         }
         this.draw();
@@ -124,6 +124,7 @@ class Background{
         this.radius=3;//px
         this.circleArray=[];
         this.colorScheme={red:255,green:255,blue:255,brightness:0.2};
+        this.closenessFactor=1.4;
         
     }
     init(){
@@ -131,7 +132,7 @@ class Background{
         var mapWindow=[];//2d array implimentation
         
         //no of dots in x axis
-        var xDimAxis=Math.ceil(window.innerWidth /(this.widthOfHexagon));
+        var xDimAxis=Math.ceil(window.innerWidth /(this.widthOfHexagon)*this.closenessFactor);
         //no of dots in y axis
         var yDimAxis=Math.ceil(window.innerHeight /(this.sideOfHexagon));
         //declaring 2d array od desired dimension with undefined
