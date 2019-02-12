@@ -191,19 +191,18 @@ class Line{
             var nextPath=0;
             var countUndefined=0
             
-            //trying to get a random next path(each path has a 20% chance of being chosen) such that the line does not go back on itself
             while(true){
                 for(var i=0;i<this.endCircle.adjoiningCircles.length;i++){
                     if(this.endCircle.adjoiningCircles[i]==undefined)countUndefined++;
                 }
-                if (countUndefined==2){
+                if (countUndefined>0){
                     nextPath=indexOfStartCircleFromEndCircle;
                     break;
                 }
                 
                 //console.log("here");
-
-
+                nextPath=Math.floor(Math.random()*this.endCircle.adjoiningCircles.length);
+                
                 if(nextPath==indexOfStartCircleFromEndCircle){
                     nextPath=(nextPath+1)%this.endCircle.adjoiningCircles.length;
                     continue;
@@ -212,7 +211,7 @@ class Line{
                 console.log("here");
 
 
-                if(this.endCircle.adjoiningCircles[nextPath]!=undefined  && Math.random()<0.2)
+                if(this.endCircle.adjoiningCircles[nextPath]!=undefined)
                     break;//path gets chosen
 
                 nextPath=(nextPath+1)%this.endCircle.adjoiningCircles.length;
