@@ -41,9 +41,11 @@ class Circle {
         
         this.minRadius = 0.2 * radius;//minimum radius is 20% of initial radius
         this.maxRadius = 3 * radius;//maximum radius is 300 % of initial radius
-        this.minBrightness=0.2;
+        this.minBrightness=0.11;
         this.maxBrightness=1;
 
+        //any vertex of a hexagon is connected to 3 other vertices 
+        //the order is clockwise
         this.adjoiningCircles=[undefined,undefined,undefined];
 
     }
@@ -51,18 +53,17 @@ class Circle {
         this.x = x;
         this.y = y;
     }
-    getX(){
-        return this.x;
-    }
-    getY(){
-        return this.y;
+    getLocation(){
+        var location={x:this.x , y:this.y };
+        return location;
     }
     draw ()//draws the circle
-    {
+    { 
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0 * Math.PI / 180, 360 * Math.PI / 180, true);
         ctx.strokeStyle = this.createRgbaString(this.color);
         ctx.stroke();
+        //console.log("BRIGHTNESS: "+this.color.brightness);
         ctx.fillStyle=this.createRgbaString(this.color);
         ctx.fill();
     }
@@ -86,14 +87,16 @@ class Circle {
         var isTooClose = this.isCircleTooClose(mouse.x, mouse.y, this.x, this.y);
         if (isTooClose && this.color.brightness <= this.maxBrightness) {
             // this.radius=this.increasedRadius;
-            this.color.brightness += 0.1;
-            console.log(isTooClose+"  dotx: "+this.x+"  doty: "+this.y+"    mousex: "+mouse.x+"   mousey: "+mouse.y);
+            this.color.brightness += 0.05;
+            //console.log(isTooClose+"  dotx: "+this.x+"  doty: "+this.y+"    mousex: "+mouse.x+"   mousey: "+mouse.y);
         }
         else if (!isTooClose && this.color.brightness > this.minBrightness) {
-            this.color.brightness -= 0.1;
+            this.color.brightness -= 0.05;
         }
         this.draw();
     }
+
+    
 
     //returns whether the two points are too close(within 50 px) of eachother
     isCircleTooClose(x1,y1,x2,y2){
@@ -117,6 +120,152 @@ class Circle {
 }
 
 
+class Line{
+    /**
+     * 
+     * @param {Circle object} startCircle 
+     * @param {Circle object} endCircle 
+     * @param {int} speed  : unit px moved in 1 frame 
+     */
+    constructor(startCircle,endCircle,speed){
+
+        this.startCircle=startCircle;
+        this.endCircle=endCircle;
+        this.startPoint=this.startCircle.getLocation();
+        this.endPoint=this.endCircle.getLocation();
+        this.speed=speed;
+        this.drawFrom=this.startPoint;
+        this.drawTo=this.startPoint;
+
+    }
+    draw ()//draws the circle
+    {
+        ctx.beginPath();
+        ctx.moveTo(this.drawFrom.x,this.drawFrom.y);
+        ctx.lineTo(this.drawTo.x,this.drawTo.y);
+        ctx.strokeStyle = this.createRgbaString(this.color);
+        ctx.stroke();
+    }
+    update()
+    {
+        //line will start from starting point and proceed till endpoint 
+        //case where line has not reached endpoint yet but is proceeding towards endpoint
+        if( this.arePointsEqual(this.drawFrom,this.startPoint) && !this.arePointsEqual(this.drawTo,this.endPoint))
+        {
+            var point=this.findPoint(this.drawTo,this.endPoint,this.speed);//returns a point at 'speed' distance from the end of present drawn line towards endpoint
+            this.drawTo=point;
+        }
+        //case when line has reached the endpoint and is receeding from startpoint
+        else if(this.arePointsEqual(this.drawTo,this.endPoint)&& !this.arePointsEqual(this.drawFrom,this.endPoint))
+        {
+            var point=this.findPoint(this.drawFrom,this.endPoint,this.speed);//returns a point at 'speed' distance from the start of present drawn line towards endpoint
+            this.drawFrom=point;
+        }
+        //case when line has receeded to endpoint and has diminished it should choose a new path from endpoint
+        else if(this.arePointsEqual(this.drawTo,this.endPoint)&& this.arePointsEqual(this.drawFrom,this.endPoint))
+        {
+            indexOfStartCircleFromEndCircle=0 //stores index of startCircle in array adjoiningCircles of endCircle
+            for( ;indexOfStartCircleFromEndCircle<this.endCircle.adjoiningCircles.length;indexOfStartCircleFromEndCircle++){
+                if (this.endCircle.adjoiningCircles[indexOfStartCircleFromEndCircle]  == this.startCircle )
+                    break;
+            }
+
+            
+            var nextPath=0;
+
+            //trying to get a random next path(each path has a 20% chance of being chosen) such that the line does not go back on itself
+            while(true){
+                var countUndefined=0
+                for(var i=0;i<this.endCircle.adjoiningCircles.length;i++){
+                    if(this.endCircle.adjoiningCircles[i]==undefined)countUndefined++;
+                }
+                if (countUndefined==2){
+                    nextPath=indexOfStartCircleFromEndCircle;
+                    break;
+                }
+
+                if(nextPath==indexOfStartCircleFromEndCircle)
+                    continue;
+                if(this.endCircle.adjoiningCircles[nextPath]!=undefined && Math.random<0.2)
+                    break;//path gets chosen
+                nextPath=(nextPath+1)%this.endCircle.adjoiningCircles.length;
+            }
+
+            this.startCircle=this.endCircle;
+            this.endCircle=this.endCircle.adjoiningCircles[nextPath];
+
+
+            this.startPoint=this.startCircle.getLocation();
+            this.endPoint=this.endCircle.getLocation();
+            this.drawFrom=this.startPoint;
+            this.drawTo=this.startPoint;
+
+        }
+
+        this.draw();
+        
+        
+    }
+
+
+     arePointsEqual(pointA,pointB){
+         return pointA.x==pointB.x && pointA.y==pointB.y;
+     }
+    /**
+     * 
+     * @param {object} start start of line 
+     * @param {object} end  end of line
+     * @param {object} distance  distance towards the end
+     * 
+     * returns a point towards end from start at a given distance 
+     */
+    findPoint(start,end,distance){
+        var slope=(end.y-start.y)/(end.x-start.x);//slope
+
+        var point1={x:undefined,y:undefined};
+        var point2={x:undefined,y:undefined};
+
+        point1.x=start.x+distance/Math.sqrt(1+slope*slope);
+        point1.y=slope*(point1.x-start.x)+start.y;
+
+        point2.x=start.x-distance/Math.sqrt(1+slope*slope);
+        point2.y=slope*(point2.x-start.x)+start.y;
+
+        if(this.isInBetween(start, point1 , end )){
+            return point1;
+        }
+        else if (this.isInBetween(start, point2, end )){
+            return point2;
+        }
+        else{
+            return end;
+        }
+
+
+    }
+
+    /**
+     * 
+     * @param {object} start // point1
+     * @param {object} point // point to be checked if is in between point1 and point 2
+     * @param {object} end // point2
+     */
+    isInBetween(start, point, end){
+        return (this.distance(start,point)+this.distance(point,end) == this.distance(start,end) );
+    }
+
+    distance(pointA,pointB){
+        return Math.sqrt((pointA.x-pointB.x)*(pointA.x-pointB.x)+(pointA.y-pointB.y)*(pointA.y-pointB.y));
+    }
+
+        
+
+}
+
+
+
+
+
 
 class Background{
     constructor(canvas,widthOfHexagon){
@@ -130,9 +279,34 @@ class Background{
         this.circleArray=[];
         this.colorScheme={red:255,green:255,blue:255,brightness:0.2};
         this.closenessFactor=1.5;
+        this.numberOfLines=10;
+        this.lineArray=[];
+        this.lineSpeed=3//px
+
         
     }
-    init(){
+    initLine(){
+        console.log('done1')
+
+        for (var i=0;i<this.numberOfLines;i++){
+            var startCircle=this.circleArray[Math.ceil(Math.random()*(this.circleArray.length-1))];
+            var tempIndex=0
+            while(true){
+                if(startCircle.adjoiningCircles[tempIndex]!=undefined && Math.random<0.5)break;
+            }
+            var endCircle=startCircle.adjoiningCircles[tempIndex];
+            console.log("start circlr: "+startCircle+" end circle: "+endCircle)
+            
+            var line=new Line(startCircle,endCircle,this.lineSpeed);
+            this.lineArray.push(line);
+        }
+
+
+
+
+    }
+
+    initCircle(){
         //initiating the graph whose elements will be stored in circleArray
         var mapWindow=[];//2d array implimentation
         
@@ -163,8 +337,70 @@ class Background{
         //fill circleArray with calculated number of circles
         this.fillCircleArray(noOfRequiredDots,this.radius,this.colorScheme);
         //console.log(this.circleArray.length);
-        this.mapCircleOnWindow(xDimAxis,yDimAxis);
+        var mapWindow=this.mapCircleOnWindow(xDimAxis,yDimAxis);
+        //console.log(mapWindow);
+        this.linkDotsAsGraph(mapWindow);
+    }
 
+
+    linkDotsAsGraph(mapWindow){
+
+        //
+
+        for(var row=0;row<mapWindow.length;row++){
+            for(var col=0;col<mapWindow[row].length;col++){
+
+                if(mapWindow[row][col]==undefined)continue;
+
+                //checking for top left
+                var adjCol=col-1;
+                var adjRow=row-1;
+                if(this.isWithinLimits(adjCol,adjRow,mapWindow[0].length,mapWindow.length)&&mapWindow[adjRow][adjCol]!=undefined ){
+                    mapWindow[row][col].adjoiningCircles[0]=mapWindow[adjRow][adjCol];
+                }
+                //checking top
+                adjCol=col;
+                adjRow=row-1;
+                if(this.isWithinLimits(adjCol,adjRow,mapWindow[0].length,mapWindow.length)&&mapWindow[adjRow][adjCol]!=undefined ){
+                    mapWindow[row][col].adjoiningCircles[0]=mapWindow[adjRow][adjCol];
+                }
+                //checking top right 
+                adjCol=col+1;
+                adjRow=row-1;
+                if(this.isWithinLimits(adjCol,adjRow,mapWindow[0].length,mapWindow.length)&&mapWindow[adjRow][adjCol]!=undefined ){
+                    mapWindow[row][col].adjoiningCircles[1]=mapWindow[adjRow][adjCol];
+                }
+                //checking bottom right
+                adjCol=col+1;
+                adjRow=row+1;
+                if(this.isWithinLimits(adjCol,adjRow,mapWindow[0].length,mapWindow.length)&&mapWindow[adjRow][adjCol]!=undefined ){
+                    mapWindow[row][col].adjoiningCircles[1]=mapWindow[adjRow][adjCol];
+                }
+                //checking bottom
+                adjCol=col;
+                adjRow=row+1;
+                if(this.isWithinLimits(adjCol,adjRow,mapWindow[0].length,mapWindow.length)&&mapWindow[adjRow][adjCol]!=undefined ){
+                    mapWindow[row][col].adjoiningCircles[2]=mapWindow[adjRow][adjCol];
+                }
+                //checking bottom left
+                adjCol=col-1;
+                adjRow=row+1;
+                if(this.isWithinLimits(adjCol,adjRow,mapWindow[0].length,mapWindow.length)&&mapWindow[adjRow][adjCol]!=undefined ){
+                    mapWindow[row][col].adjoiningCircles[2]=mapWindow[adjRow][adjCol];
+                }
+            }
+        }
+
+    }
+
+    /**
+     * @param x : given x coordinate
+     * @param y : given y coordinate
+     * @param xAxis : length of x axis
+     * @param yAxis : length of y axis
+     */
+    isWithinLimits(x,y,xAxis,yAxis){
+        return(0<=x && x<xAxis  && 0<=y && y<yAxis) 
     }
 
 
@@ -248,8 +484,7 @@ class Background{
             }
         }
 
-        console.log(mapWindow);
-
+        return mapWindow
     }
 
         
@@ -265,7 +500,9 @@ canvas.width = window.innerWidth;
 canvas.height= window.innerHeight;
 var widthOfHexagon=50;//px
 var background=new Background(canvas,widthOfHexagon)
-background.init();
+background.initCircle();
+console.log("done");
+background.initLine();
 function animate(){
     
     requestAnimationFrame(animate);
