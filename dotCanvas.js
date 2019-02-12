@@ -127,31 +127,46 @@ class Line{
      * @param {Circle object} endCircle 
      * @param {int} speed  : unit px moved in 1 frame 
      */
-    constructor(startCircle,endCircle,speed){
+    constructor(startCircle,endCircle,speed,color){
 
         this.startCircle=startCircle;
         this.endCircle=endCircle;
         this.startPoint=this.startCircle.getLocation();
         this.endPoint=this.endCircle.getLocation();
         this.speed=speed;
-        this.drawFrom=this.startPoint;
-        this.drawTo=this.startPoint;
+        this.drawFrom=this.startCircle.getLocation();
+        this.drawTo=this.startCircle.getLocation();
+        this.color=color;
 
     }
-    draw ()//draws the circle
+    draw ()//draws the line
     {
+        console.log("draw")
         ctx.beginPath();
         ctx.moveTo(this.drawFrom.x,this.drawFrom.y);
         ctx.lineTo(this.drawTo.x,this.drawTo.y);
         ctx.strokeStyle = this.createRgbaString(this.color);
         ctx.stroke();
     }
+    // convert {r,g,b,b} to rgba string
+    createRgbaString(color) {
+        return `rgba(${color.red},${color.green},${color.blue},${color.brightness})`;
+    }
     update()
     {
         //line will start from starting point and proceed till endpoint 
         //case where line has not reached endpoint yet but is proceeding towards endpoint
+        
+        
+        console.log("condition1:"+this.arePointsEqual(this.drawFrom,this.startPoint)+"+"+!this.arePointsEqual(this.drawTo,this.endPoint));
+        console.log("condition2:"+this.arePointsEqual(this.drawTo,this.endPoint) +"+"+ !this.arePointsEqual(this.drawFrom,this.endPoint));
+        console.log("condition3:"+this.arePointsEqual(this.drawTo,this.endPoint)+"+"+ this.arePointsEqual(this.drawFrom,this.endPoint));
+        
+        
+        
         if( this.arePointsEqual(this.drawFrom,this.startPoint) && !this.arePointsEqual(this.drawTo,this.endPoint))
         {
+            console.log("here");
             var point=this.findPoint(this.drawTo,this.endPoint,this.speed);//returns a point at 'speed' distance from the end of present drawn line towards endpoint
             this.drawTo=point;
         }
@@ -164,18 +179,20 @@ class Line{
         //case when line has receeded to endpoint and has diminished it should choose a new path from endpoint
         else if(this.arePointsEqual(this.drawTo,this.endPoint)&& this.arePointsEqual(this.drawFrom,this.endPoint))
         {
-            indexOfStartCircleFromEndCircle=0 //stores index of startCircle in array adjoiningCircles of endCircle
+            var indexOfStartCircleFromEndCircle=0 //stores index of startCircle in array adjoiningCircles of endCircle
             for( ;indexOfStartCircleFromEndCircle<this.endCircle.adjoiningCircles.length;indexOfStartCircleFromEndCircle++){
                 if (this.endCircle.adjoiningCircles[indexOfStartCircleFromEndCircle]  == this.startCircle )
                     break;
             }
 
             
-            var nextPath=0;
 
+            
+            var nextPath=0;
+            var countUndefined=0
+            
             //trying to get a random next path(each path has a 20% chance of being chosen) such that the line does not go back on itself
             while(true){
-                var countUndefined=0
                 for(var i=0;i<this.endCircle.adjoiningCircles.length;i++){
                     if(this.endCircle.adjoiningCircles[i]==undefined)countUndefined++;
                 }
@@ -183,14 +200,26 @@ class Line{
                     nextPath=indexOfStartCircleFromEndCircle;
                     break;
                 }
+                
+                //console.log("here");
 
-                if(nextPath==indexOfStartCircleFromEndCircle)
+
+                if(nextPath==indexOfStartCircleFromEndCircle){
+                    nextPath=(nextPath+1)%this.endCircle.adjoiningCircles.length;
                     continue;
-                if(this.endCircle.adjoiningCircles[nextPath]!=undefined && Math.random<0.2)
-                    break;//path gets chosen
-                nextPath=(nextPath+1)%this.endCircle.adjoiningCircles.length;
-            }
+                }
 
+                console.log("here");
+
+
+                if(this.endCircle.adjoiningCircles[nextPath]!=undefined )//&& Math.random()<0.2)
+                    break;//path gets chosen
+
+                nextPath=(nextPath+1)%this.endCircle.adjoiningCircles.length;
+
+                console.log("nextPath: "+nextPath);
+            }
+            console.log("here");
             this.startCircle=this.endCircle;
             this.endCircle=this.endCircle.adjoiningCircles[nextPath];
 
@@ -238,7 +267,8 @@ class Line{
             return point2;
         }
         else{
-            return end;
+            var endCopy={x:end.x , y: end.y};
+            return endCopy;
         }
 
 
@@ -279,27 +309,30 @@ class Background{
         this.circleArray=[];
         this.colorScheme={red:255,green:255,blue:255,brightness:0.2};
         this.closenessFactor=1.5;
-        this.numberOfLines=10;
+        this.numberOfLines=100;
         this.lineArray=[];
         this.lineSpeed=3//px
 
         
     }
     initLine(){
-        console.log('done1')
+       
 
         for (var i=0;i<this.numberOfLines;i++){
             var startCircle=this.circleArray[Math.ceil(Math.random()*(this.circleArray.length-1))];
-            var tempIndex=0
+            var tempIndex=0;
+            
             while(true){
-                if(startCircle.adjoiningCircles[tempIndex]!=undefined && Math.random<0.5)break;
+                if(startCircle.adjoiningCircles[tempIndex]!=undefined )break;
+                tempIndex++;
             }
             var endCircle=startCircle.adjoiningCircles[tempIndex];
             console.log("start circlr: "+startCircle+" end circle: "+endCircle)
             
-            var line=new Line(startCircle,endCircle,this.lineSpeed);
+            var line=new Line(startCircle,endCircle,this.lineSpeed,this.colorScheme);
             this.lineArray.push(line);
         }
+        console.log(this.lineArray);
 
 
 
@@ -501,7 +534,7 @@ canvas.height= window.innerHeight;
 var widthOfHexagon=50;//px
 var background=new Background(canvas,widthOfHexagon)
 background.initCircle();
-console.log("done");
+
 background.initLine();
 function animate(){
     
@@ -509,6 +542,10 @@ function animate(){
     ctx.clearRect(0,0,innerWidth,innerHeight);
     for(var i=0;i<background.circleArray.length;i++){
         background.circleArray[i].update();
+    }
+    for(var i=0;i<background.lineArray.length;i++){
+        console.log("iteration : "+i);
+        background.lineArray[i].update();
     }
 
 }
