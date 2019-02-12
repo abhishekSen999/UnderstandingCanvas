@@ -310,7 +310,7 @@ class Background{
         this.closenessFactor=1.5;
         this.numberOfLines=1000;
         this.lineArray=[];
-        this.lineSpeed=3//px
+        this.lineSpeed=2//px
 
         
     }
