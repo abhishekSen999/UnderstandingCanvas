@@ -212,7 +212,7 @@ class Line{
                 console.log("here");
 
 
-                if(this.endCircle.adjoiningCircles[nextPath]!=undefined )//&& Math.random()<0.2)
+                if(this.endCircle.adjoiningCircles[nextPath]!=undefined  && Math.random()<0.2)
                     break;//path gets chosen
 
                 nextPath=(nextPath+1)%this.endCircle.adjoiningCircles.length;
