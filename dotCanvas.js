@@ -158,15 +158,15 @@ class Line{
         //case where line has not reached endpoint yet but is proceeding towards endpoint
         
         
-        console.log("condition1:"+this.arePointsEqual(this.drawFrom,this.startPoint)+"+"+!this.arePointsEqual(this.drawTo,this.endPoint));
-        console.log("condition2:"+this.arePointsEqual(this.drawTo,this.endPoint) +"+"+ !this.arePointsEqual(this.drawFrom,this.endPoint));
-        console.log("condition3:"+this.arePointsEqual(this.drawTo,this.endPoint)+"+"+ this.arePointsEqual(this.drawFrom,this.endPoint));
+        // console.log("condition1:"+this.arePointsEqual(this.drawFrom,this.startPoint)+"+"+!this.arePointsEqual(this.drawTo,this.endPoint));
+        // console.log("condition2:"+this.arePointsEqual(this.drawTo,this.endPoint) +"+"+ !this.arePointsEqual(this.drawFrom,this.endPoint));
+        // console.log("condition3:"+this.arePointsEqual(this.drawTo,this.endPoint)+"+"+ this.arePointsEqual(this.drawFrom,this.endPoint));
         
         
         
         if( this.arePointsEqual(this.drawFrom,this.startPoint) && !this.arePointsEqual(this.drawTo,this.endPoint))
         {
-            console.log("here");
+            
             var point=this.findPoint(this.drawTo,this.endPoint,this.speed);//returns a point at 'speed' distance from the end of present drawn line towards endpoint
             this.drawTo=point;
         }
@@ -200,7 +200,7 @@ class Line{
                     break;
                 }
                 
-                //console.log("here");
+                
                 nextPath=Math.floor(Math.random()*this.endCircle.adjoiningCircles.length);
                 
                 if(nextPath==indexOfStartCircleFromEndCircle){
@@ -208,7 +208,7 @@ class Line{
                     continue;
                 }
 
-                console.log("here");
+                ;
 
 
                 if(this.endCircle.adjoiningCircles[nextPath]!=undefined)
@@ -216,9 +216,9 @@ class Line{
 
                 nextPath=(nextPath+1)%this.endCircle.adjoiningCircles.length;
 
-                console.log("nextPath: "+nextPath);
+                
             }
-            console.log("here");
+            
             this.startCircle=this.endCircle;
             this.endCircle=this.endCircle.adjoiningCircles[nextPath];
 
@@ -310,7 +310,7 @@ class Background{
         this.closenessFactor=1.5;
         this.numberOfLines=500;
         this.lineArray=[];
-        this.lineSpeed=2//px
+        this.lineSpeed=1//px
 
         
     }
