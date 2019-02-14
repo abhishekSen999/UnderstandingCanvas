@@ -87,7 +87,7 @@ class Circle {
         var isTooClose = this.isCircleTooClose(mouse.x, mouse.y, this.x, this.y);
         if (isTooClose && this.color.brightness <= this.maxBrightness) {
             // this.radius=this.increasedRadius;
-            this.color.brightness += 0.05;
+            this.color.brightness += 0.1;
             //console.log(isTooClose+"  dotx: "+this.x+"  doty: "+this.y+"    mousex: "+mouse.x+"   mousey: "+mouse.y);
         }
         else if (!isTooClose && this.color.brightness > this.minBrightness) {
