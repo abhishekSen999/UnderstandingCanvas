@@ -105,7 +105,7 @@ class Circle {
         // return false;    
 
         var distance = Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
-        if(distance<60)
+        if(distance<90)
             return true;
         return false;
     
